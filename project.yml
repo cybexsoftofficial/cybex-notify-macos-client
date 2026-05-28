@@ -1,0 +1,59 @@
+name: CybexsoftNotify
+
+options:
+  bundleIdPrefix: com.cybexsoft
+  deploymentTarget:
+    macOS: "13.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "13.0"
+    # Ad-hoc signing — no Apple Developer account required for CI builds
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGNING_REQUIRED: "NO"
+    CODE_SIGNING_ALLOWED: "NO"
+    ENABLE_HARDENED_RUNTIME: "NO"
+
+targets:
+  CybexsoftNotify:
+    type: application
+    platform: macOS
+    deploymentTarget: "13.0"
+
+    sources:
+      - path: CybexsoftNotify
+        excludes:
+          - Assets.xcassets
+          - "*.entitlements"
+
+    resources:
+      - CybexsoftNotify/Assets.xcassets
+
+    info:
+      path: CybexsoftNotify/Info.plist
+      properties:
+        CFBundleDisplayName: CybexsoftNotify
+        CFBundleIdentifier: com.cybexsoft.notify
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        LSMinimumSystemVersion: "$(MACOSX_DEPLOYMENT_TARGET)"
+        # Hide from Dock — menu-bar-only app
+        LSUIElement: YES
+        NSPrincipalClass: NSApplication
+        NSUserNotificationsUsageDescription: "Displays push notifications from your configured Notify servers."
+        # Allow plain ws:// connections (non-TLS servers)
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: YES
+
+    entitlements:
+      path: CybexsoftNotify/CybexsoftNotify.entitlements
+
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.cybexsoft.notify
+        INFOPLIST_FILE: CybexsoftNotify/Info.plist
+        CODE_SIGN_ENTITLEMENTS: CybexsoftNotify/CybexsoftNotify.entitlements
+        COMBINE_HIDPI_IMAGES: "YES"
