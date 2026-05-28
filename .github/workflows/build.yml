@@ -7,6 +7,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write  # needed to create/update releases
+
 jobs:
   build:
     name: Build & Package DMG
@@ -59,10 +62,27 @@ jobs:
           path: dist/CybexsoftNotify.dmg
           retention-days: 30
 
-      # On version tags (v1.0.0, v1.2.3 …) create a GitHub Release
-      - name: Create GitHub Release
+      # Every push to main updates the "latest" pre-release — always downloadable
+      - name: Update latest pre-release
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "Latest Build"
+          prerelease: true
+          make_latest: false
+          files: dist/CybexsoftNotify.dmg
+          body: |
+            Auto-updated on every push to `main`.
+            Built from commit ${{ github.sha }}.
+
+            > **First-time install on macOS:** right-click → Open to bypass Gatekeeper (app is not notarized).
+
+      # Push a version tag (v1.0.0 …) to create a proper stable release
+      - name: Create versioned release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           files: dist/CybexsoftNotify.dmg
+          make_latest: true
           generate_release_notes: true
